@@ -6,6 +6,12 @@ pipeline {
         maven 'Maven 3.6.3'
     }
 
+    environment {
+        IMAGE_NAME = 'ticketapp:latest'
+        DEPLOYMENT_YAML = 'k8s/deployment.yaml'
+        SERVICE_YAML = 'k8s/service.yaml'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -41,14 +47,40 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "🛠 Building Docker image: ${IMAGE_NAME}"
+                    sh "docker build -t ${IMAGE_NAME} ."
+                }
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                script {
+                    echo "🚀 Deploying to Minikube..."
+
+                    sh "kubectl apply -f ${DEPLOYMENT_YAML}"
+                    sh "kubectl apply -f ${SERVICE_YAML}"
+
+                    timeout(time: 5, unit: 'MINUTES') {
+                        sh 'kubectl rollout status deployment/ticketapp-deployment --watch=true'
+                    }
+
+                    echo "Application deployed"
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo 'CI/CD pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed!'
+            echo 'CI/CD pipeline failed'
         }
     }
 }
