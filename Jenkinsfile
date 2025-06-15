@@ -10,6 +10,8 @@ pipeline {
         IMAGE_NAME = 'ticketapp:latest'
         DEPLOYMENT_YAML = 'k8s/deployment.yaml'
         SERVICE_YAML = 'k8s/service.yaml'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+        MINIKUBE_HOME = '/var/lib/jenkins'
     }
 
     stages {
