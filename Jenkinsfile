@@ -64,11 +64,14 @@ pipeline {
                 script {
                     echo "🚀 Deploying to Minikube..."
 
+                    sh 'echo "Using kubeconfig:" && echo $KUBECONFIG && cat $KUBECONFIG'
+
                     sh "kubectl apply -f ${DEPLOYMENT_YAML}"
                     sh "kubectl apply -f ${SERVICE_YAML}"
 
                     timeout(time: 5, unit: 'MINUTES') {
                         sh 'kubectl rollout status deployment/ticketapp-deployment --watch=true'
+
                     }
 
                     echo "Application deployed"
@@ -76,6 +79,8 @@ pipeline {
             }
         }
     }
+
+    
 
     post {
         success {
