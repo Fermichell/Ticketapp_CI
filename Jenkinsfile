@@ -53,13 +53,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo "🛠 Building Docker image: ${IMAGE_NAME}"
-                    sh "eval \$(minikube docker-env) && docker build -t ${IMAGE_NAME} ."
-                }
+                sh '''
+                    echo "🛠 Switching Docker to Minikube context..."
+                    eval $(minikube docker-env)
+                    docker build -t ticketapp:latest .
+                '''
             }
         }
-
 
         stage('Deploy to Minikube') {
             steps {
