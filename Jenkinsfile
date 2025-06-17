@@ -50,17 +50,21 @@ pipeline {
             }
         }
 
-
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    echo "🛠 Building Docker image for Minikube"
-                    docker build -t ticketapp:latest .
-                    minikube image load ticketapp:latest
-                '''
+                script {
+                    def registry = "192.168.49.2:5000"
+                    def fullImageName = "${registry}/ticketapp:latest"
+                    env.IMAGE_NAME = fullImageName
+
+                    sh """
+                        echo "🛠 Building and pushing image: ${fullImageName}"
+                        docker build -t ${fullImageName} .
+                        docker push ${fullImageName}
+                    """
+                }
             }
         }
-
 
         stage('Deploy to Minikube') {
             steps {
@@ -74,7 +78,6 @@ pipeline {
 
                     timeout(time: 5, unit: 'MINUTES') {
                         sh 'kubectl rollout status deployment/ticketapp-deployment --watch=true'
-
                     }
 
                     echo "Application deployed"
@@ -82,8 +85,6 @@ pipeline {
             }
         }
     }
-
-    
 
     post {
         success {
