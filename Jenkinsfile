@@ -61,6 +61,7 @@ pipeline {
             }
         }
 
+
         stage('Deploy to Minikube') {
             steps {
                 script {
