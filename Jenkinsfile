@@ -50,14 +50,16 @@ pipeline {
             }
         }
 
+
         stage('Build Docker Image') {
             steps {
                 script {
                     echo "🛠 Building Docker image: ${IMAGE_NAME}"
-                    sh "docker build -t ${IMAGE_NAME} ."
+                    sh 'eval $(minikube docker-env) && docker build -t ${IMAGE_NAME} .'
                 }
             }
         }
+
 
         stage('Deploy to Minikube') {
             steps {
