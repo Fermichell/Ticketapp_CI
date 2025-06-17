@@ -54,9 +54,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    echo "🛠 Switching Docker to Minikube context..."
-                    eval $(minikube docker-env)
+                    echo "🛠 Building Docker image for Minikube"
                     docker build -t ticketapp:latest .
+                    minikube image load ticketapp:latest
                 '''
             }
         }
